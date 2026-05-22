@@ -13,10 +13,12 @@
 - [x] Population of context files from PLAN.md.
 - [x] Establishing implementation strategy.
 - [x] Backend initialization with Express, TypeScript, and basic config.
+- [x] Pipeline Step 1: Script Generator (OpenRouter/DeepSeek integration).
+- [x] Orchestrator skeleton and basic API endpoint (/api/generate).
 
 ## In Progress
 
-- Defining core backend structure (routes, controllers, etc.).
+- Pipeline Step 2: TTS Generator (ElevenLabs integration).
 
 ## Next Up
 
