@@ -1,6 +1,7 @@
 import { generateScript, ScriptLine } from './scriptGenerator';
 import { generateTTS, AudioSegment } from './ttsGenerator';
 import { mergeAudio, MergedAudio } from './audioMerger';
+import { generateSubtitles } from './subtitleGenerator';
 
 export interface PipelineInput {
   topic: string;
@@ -34,10 +35,13 @@ export async function runPipeline(jobId: string, input: PipelineInput) {
     console.log(`[Job ${jobId}] Step 3: Merging audio segments...`);
     const mergedAudio = await mergeAudio(jobId, audioSegments);
 
-    // Step 4: Generate Subtitles (To be implemented)
+    // Step 4: Generate Subtitles
+    console.log(`[Job ${jobId}] Step 4: Generating styled subtitles...`);
+    const subtitlePath = await generateSubtitles(jobId, audioSegments);
+
     // Step 5: Composite Video (To be implemented)
 
-    return { success: true, script, audioSegments, mergedAudio };
+    return { success: true, script, audioSegments, mergedAudio, subtitlePath };
   } catch (error: any) {
     console.error(`[Job ${jobId}] Pipeline failed:`, error.message);
     return { success: false, error: error.message };

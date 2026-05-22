@@ -15,10 +15,13 @@
 - [x] Backend initialization with Express, TypeScript, and basic config.
 - [x] Pipeline Step 1: Script Generator (OpenRouter/DeepSeek integration).
 - [x] Orchestrator skeleton and basic API endpoint (/api/generate).
+- [x] Pipeline Step 2: TTS Generator (ElevenLabs SDK integration).
+- [x] Pipeline Step 3: Audio Merger (FFmpeg integration).
+- [x] Pipeline Step 4: Subtitle Generator (Styled ASS generation).
 
 ## In Progress
 
-- Pipeline Step 2: TTS Generator (ElevenLabs integration).
+- Pipeline Step 5: Video Compositor (FFmpeg final render).
 
 ## Next Up
 
