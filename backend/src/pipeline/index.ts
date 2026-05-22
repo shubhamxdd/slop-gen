@@ -1,7 +1,9 @@
+import path from 'path';
 import { generateScript, ScriptLine } from './scriptGenerator';
 import { generateTTS, AudioSegment } from './ttsGenerator';
 import { mergeAudio, MergedAudio } from './audioMerger';
 import { generateSubtitles } from './subtitleGenerator';
+import { compositeVideo } from './videoCompositor';
 
 export interface PipelineInput {
   topic: string;
@@ -39,9 +41,24 @@ export async function runPipeline(jobId: string, input: PipelineInput) {
     console.log(`[Job ${jobId}] Step 4: Generating styled subtitles...`);
     const subtitlePath = await generateSubtitles(jobId, audioSegments);
 
-    // Step 5: Composite Video (To be implemented)
+    // Step 5: Composite Video
+    console.log(`[Job ${jobId}] Step 5: Compositing final video...`);
+    // Map backgroundId to actual file (for now assuming it's in assets/background)
+    const backgroundVideoPath = path.join(process.cwd(), 'assets', 'background', `${input.backgroundId}.mp4`);
+    const videoOutput = await compositeVideo(
+      jobId,
+      backgroundVideoPath,
+      mergedAudio.filePath,
+      subtitlePath,
+      mergedAudio.totalDuration
+    );
 
-    return { success: true, script, audioSegments, mergedAudio, subtitlePath };
+    return { 
+      success: true, 
+      jobId,
+      videoPath: videoOutput.filePath,
+      duration: mergedAudio.totalDuration 
+    };
   } catch (error: any) {
     console.error(`[Job ${jobId}] Pipeline failed:`, error.message);
     return { success: false, error: error.message };
