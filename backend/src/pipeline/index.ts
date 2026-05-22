@@ -1,4 +1,6 @@
 import { generateScript, ScriptLine } from './scriptGenerator';
+import { generateTTS, AudioSegment } from './ttsGenerator';
+import { mergeAudio, MergedAudio } from './audioMerger';
 
 export interface PipelineInput {
   topic: string;
@@ -19,12 +21,23 @@ export async function runPipeline(jobId: string, input: PipelineInput) {
     const script = await generateScript(input.topic, characters);
     console.log(`[Job ${jobId}] Script generated:`, JSON.stringify(script));
 
-    // Step 2: Generate TTS (To be implemented)
-    // Step 3: Merge Audio (To be implemented)
+    // Step 2: Generate TTS
+    console.log(`[Job ${jobId}] Step 2: Generating TTS...`);
+    const voiceMap: Record<string, string> = {
+      [input.characters.A.name]: input.characters.A.voiceId,
+      [input.characters.B.name]: input.characters.B.voiceId,
+    };
+    const audioSegments = await generateTTS(jobId, script, voiceMap);
+    console.log(`[Job ${jobId}] TTS generated: ${audioSegments.length} segments`);
+
+    // Step 3: Merge Audio
+    console.log(`[Job ${jobId}] Step 3: Merging audio segments...`);
+    const mergedAudio = await mergeAudio(jobId, audioSegments);
+
     // Step 4: Generate Subtitles (To be implemented)
     // Step 5: Composite Video (To be implemented)
 
-    return { success: true, script };
+    return { success: true, script, audioSegments, mergedAudio };
   } catch (error: any) {
     console.error(`[Job ${jobId}] Pipeline failed:`, error.message);
     return { success: false, error: error.message };

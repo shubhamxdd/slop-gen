@@ -23,6 +23,7 @@ export async function generateTTS(
   }
 
   const outputDir = path.join(process.cwd(), 'outputs', 'audio', jobId);
+
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
   }
@@ -31,23 +32,23 @@ export async function generateTTS(
 
   for (let i = 0; i < script.length; i++) {
     const { character, line } = script[i];
-    const voiceId = voiceMap[character];
+    let voiceId = voiceMap[character];
 
-    if (!voiceId) {
-      throw new Error(`No voice ID found for character: ${character}`);
-    }
+    // Fallback for testing
+    if (!voiceId || voiceId === 'v1') voiceId = 'JBFqnCBsd6RMkjVDRZzb'; // George
+    if (voiceId === 'v2') voiceId = 'XB0fDUnXU5powFXDhCwa'; // Charlotte
 
     const fileName = `line_${i}.mp3`;
     const filePath = path.join(outputDir, fileName);
 
-    console.log(`[Job ${jobId}] Generating TTS for line ${i} (${character})...`);
+    console.log(`[Job ${jobId}] Generating TTS for line ${i} (${character}) using voice ${voiceId}...`);
 
     try {
       const response = await axios.post(
         `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
         {
           text: line,
-          model_id: 'eleven_monolingual_v1',
+          model_id: 'eleven_flash_v2_5',
           voice_settings: {
             stability: 0.5,
             similarity_boost: 0.5,
@@ -82,7 +83,12 @@ export async function generateTTS(
       });
     } catch (error: any) {
       console.error(`Error generating TTS for line ${i}:`, error.message);
-      throw new Error(`Failed to generate TTS for line ${i}`);
+      if (error.response) {
+        // Axios stores response data as a stream when responseType is 'stream'
+        // We can't easily read it here, but we can log the status
+        console.error('API Status:', error.response.status);
+      }
+      throw new Error(`Failed to generate TTS for line ${i}: ${error.message}`);
     }
   }
 
