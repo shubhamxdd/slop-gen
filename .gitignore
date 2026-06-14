@@ -4,3 +4,6 @@ node_modules
 *.mp4
 *.ass
 *.mp4
+
+/graphify-out
+/graphold

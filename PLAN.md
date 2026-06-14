@@ -740,4 +740,23 @@ Frontend: shows success, unlocks features
 
 ---
 
+## 15. Future Roadmap
+
+### Short Term (v2.1)
+- **BullMQ Integration**: Move video rendering to a background worker process.
+- **DigitalOcean Spaces**: Switch from local storage to cloud storage for scale.
+- **Dockerization**: Full containerized stack for easy deployment.
+
+### Mid Term (v2.2)
+- **Social Connect**: One-click posting to YouTube Shorts and Instagram Reels.
+- **AI Backgrounds**: Integrate Flux/Stable Diffusion for custom scene generation.
+- **Manual Editor**: A simple web UI to edit the script lines before hitting "Render".
+
+### Long Term (v3.0)
+- **Face Animation**: Use LivePortrait or similar tech to animate character avatars.
+- **Multi-Language**: Auto-translate scripts and use localized ElevenLabs voices.
+- **Viral Predictor**: AI that scores script ideas based on current TikTok trends.
+
+---
+
 *ClipForge — Confidential Product Plan · v2.0*
