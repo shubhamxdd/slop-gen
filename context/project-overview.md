@@ -12,12 +12,14 @@ ClipForge is an AI-powered SaaS designed to generate viral-style short videos (9
 
 ## Core User Flow
 
-1. User enters a topic or script and selects two characters and a background.
-2. User submits the request (POST /api/generate).
-3. Backend generates a dialogue script using DeepSeek-R1 (OpenRouter).
-4. Backend generates audio files for each line using ElevenLabs.
-5. Backend merges audio, generates styled ASS subtitles, and composites the final MP4 with gameplay footage.
-6. User polls for job status and downloads the finished video.
+1. User registers with email, username, and password.
+2. User verifies email via 6-digit OTP sent to their inbox.
+3. User logs in (via email or username) and selects two characters and a background.
+4. User enters a topic and submits the request (POST /api/generate).
+5. Backend generates a dialogue script using DeepSeek-R1 (OpenRouter).
+6. Backend generates audio files for each line using ElevenLabs.
+7. Backend merges audio, generates styled ASS subtitles, and composites the final MP4 with gameplay footage.
+8. User polls for job status and downloads the finished video.
 
 ## Features
 
@@ -28,7 +30,7 @@ ClipForge is an AI-powered SaaS designed to generate viral-style short videos (9
 - **Video Compositing**: Background looping and multi-layer rendering via FFmpeg.
 
 ### User Management & Payments
-- **Auth**: JWT-based registration and login.
+- **Auth**: JWT-based registration and login with email verification (OTP).
 - **Payments**: Razorpay integration for subscription plans.
 - **History**: Dashboard to view and download previously generated videos.
 
@@ -37,7 +39,9 @@ ClipForge is an AI-powered SaaS designed to generate viral-style short videos (9
 ### In Scope
 - Node.js/Express/TypeScript Backend.
 - Vite/React/TypeScript Frontend.
-- MongoDB for data storage (users, jobs, videos).
+- PostgreSQL for data storage (users, jobs, videos, OTP codes).
+- Drizzle ORM for type-safe database queries.
+- Nodemailer (Gmail) for OTP verification emails.
 - Local file storage for dev, DigitalOcean Spaces for prod.
 - Synchronous (for v1) video generation pipeline.
 

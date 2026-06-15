@@ -9,6 +9,7 @@ Build ClipForge incrementally starting with the Backend Pipeline. The pipeline i
 - Implement one pipeline step at a time (Script -> TTS -> Merge -> Subtitles -> Composite).
 - Verify each step with a script or test before moving to the next.
 - The backend must be fully functional via API (Postman/Curl) before starting the Frontend.
+- Auth must be fully functional before protecting generation routes.
 
 ## When to Split Work
 
@@ -30,6 +31,7 @@ Build ClipForge incrementally starting with the Backend Pipeline. The pipeline i
 
 - Update `progress-tracker.md` after each pipeline step is completed.
 - Update `architecture.md` if switching from synchronous to asynchronous (BullMQ).
+- Update `architecture.md` if changing database or ORM.
 
 ## Before Moving to the Next Unit
 
