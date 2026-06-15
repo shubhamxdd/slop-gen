@@ -6,8 +6,8 @@
 
 ## Current Goal
 
-- Implement job tracking and video history endpoints.
-- Transition to asynchronous job processing (optional for v1, but good to keep in mind).
+- Implement asynchronous video generation using BullMQ and Redis.
+- Add job status polling and video history endpoints.
 
 ## Completed
 
@@ -28,14 +28,18 @@
 
 ## In Progress
 
-- (Nothing currently in progress)
+- [ ] Transition to asynchronous job processing with BullMQ.
 
 ## Next Up
 
 - Phase 2: Auth + Full API
-  1. Job status polling endpoint
-  2. Video history endpoint
-  3. Error handling middleware refinement
+  1. Install BullMQ and configure Redis connection for queues.
+  2. Implement `src/queues/video.queue.ts` (Job producer).
+  3. Implement `src/workers/video.worker.ts` (Job consumer/processor).
+  4. Refactor `POST /api/generate` to enqueue jobs.
+  5. Job status polling endpoint (`GET /api/jobs/:id`).
+  6. Video history endpoint (`GET /api/videos`).
+  7. Error handling middleware refinement.
 - Phase 3: Frontend
 - Phase 4: Payments + Launch
 
