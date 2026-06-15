@@ -4,10 +4,12 @@ import dotenv from 'dotenv';
 import { v4 as uuidv4 } from 'uuid';
 import { runPipeline, PipelineInput } from './pipeline';
 
+import { env } from "./config/env"
+
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
