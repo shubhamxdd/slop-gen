@@ -42,7 +42,8 @@
 - Password hashing: bcryptjs with salt rounds of 10.
 - JWT expiry: 7 days.
 - OTP: 6-digit numeric, expires in 10 minutes, max 3 resend attempts per hour.
-- Store OTP hashes in DB, not plaintext.
+- Store OTP in Redis with TTL for automatic expiry.
+- Rate limiting for OTP resend handled via Redis counters.
 
 ## Data and Storage
 

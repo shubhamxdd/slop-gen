@@ -2,13 +2,12 @@
 
 ## Current Phase
 
-- Phase 2: Auth + Full API (Not Started)
+- Phase 2: Auth + Full API (In Progress)
 
 ## Current Goal
 
-- Implement PostgreSQL + Drizzle ORM setup.
-- Build auth system: register, login, email verification (OTP).
-- Add job tracking and video history endpoints.
+- Implement job tracking and video history endpoints.
+- Transition to asynchronous job processing (optional for v1, but good to keep in mind).
 
 ## Completed
 
@@ -20,6 +19,12 @@
 - [x] Pipeline Step 3: Audio Merger (FFmpeg integration).
 - [x] Pipeline Step 4: Subtitle Generator (Styled ASS generation).
 - [x] Pipeline Step 5: Video Compositor (FFmpeg final render).
+- [x] PostgreSQL + Drizzle setup (schema, connection)
+- [x] Redis integration for OTP caching.
+- [x] User model & Job model implementation.
+- [x] Auth routes: register, login, verify-otp, resend-otp, me.
+- [x] Auth middleware (JWT verification).
+- [x] Protected /api/generate behind auth.
 
 ## In Progress
 
@@ -28,15 +33,9 @@
 ## Next Up
 
 - Phase 2: Auth + Full API
-  1. PostgreSQL + Drizzle setup (docker-compose, schema, connection)
-  2. User model (email, username, passwordHash, plan, isVerified)
-  3. Job model (jobId, userId, status, progress, input, output)
-  4. Auth routes: register, login, verify-otp, resend-otp, me
-  5. Auth middleware (JWT verification)
-  6. Error handling middleware
-  7. Protect /api/generate behind auth
-  8. Job status polling endpoint
-  9. Video history endpoint
+  1. Job status polling endpoint
+  2. Video history endpoint
+  3. Error handling middleware refinement
 - Phase 3: Frontend
 - Phase 4: Payments + Launch
 

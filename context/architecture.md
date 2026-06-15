@@ -8,7 +8,8 @@
 | Frontend  | Vite + React + TS           | User Interface                            |
 | UI        | Vanilla CSS (Modern)        | Styling (Avoiding Tailwind per guidelines)|
 | Auth      | JWT + Bcrypt + OTP          | Custom Authentication with Email Verify   |
-| Database  | PostgreSQL (Docker)         | User, Job, Video, and OTP storage         |
+| Database  | PostgreSQL (Docker)         | User, Job, and Video storage              |
+| Cache     | Redis                       | OTP and Rate Limit storage                |
 | ORM       | Drizzle ORM                 | Type-safe SQL queries                     |
 | Pipeline  | FFmpeg                      | Video Compositing and Audio Merging       |
 | AI Models | OpenRouter (DeepSeek)       | Script Generation                         |
@@ -19,14 +20,15 @@
 
 - `src/pipeline/` — Core generation logic (Script, TTS, Subtitles, Compositing).
 - `src/routes/` — API endpoint definitions.
-- `src/db/` — Drizzle schema, migrations, and database connection.
+- `src/db/` — Drizzle schema, migrations, connection, and Redis client.
 - `src/middleware/` — Auth verification, error handling.
 - `outputs/` — Local storage for generated media (audio, video, subs).
 - `assets/` — Static assets (background gameplay clips).
 
 ## Storage Model
 
-- **PostgreSQL**: Stores user accounts, job statuses, video metadata, and OTP codes.
+- **PostgreSQL**: Stores user accounts, job statuses, and video metadata.
+- **Redis**: Stores ephemeral OTP codes and resend rate limit counters.
 - **File System / DO Spaces**: Stores final MP4 outputs, intermediate audio chunks, and subtitle files.
 
 ## Auth and Access Model
