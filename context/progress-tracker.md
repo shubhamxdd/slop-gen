@@ -2,13 +2,12 @@
 
 ## Current Phase
 
-- Phase 2: Auth + Full API (Not Started)
+- Phase 2: Auth + Full API (In Progress)
 
 ## Current Goal
 
-- Implement PostgreSQL + Drizzle ORM setup.
-- Build auth system: register, login, email verification (OTP).
-- Add job tracking and video history endpoints.
+- Implement asynchronous video generation using BullMQ and Redis.
+- Add job status polling and video history endpoints.
 
 ## Completed
 
@@ -20,23 +19,27 @@
 - [x] Pipeline Step 3: Audio Merger (FFmpeg integration).
 - [x] Pipeline Step 4: Subtitle Generator (Styled ASS generation).
 - [x] Pipeline Step 5: Video Compositor (FFmpeg final render).
+- [x] PostgreSQL + Drizzle setup (schema, connection)
+- [x] Redis integration for OTP caching.
+- [x] User model & Job model implementation.
+- [x] Auth routes: register, login, verify-otp, resend-otp, me.
+- [x] Auth middleware (JWT verification).
+- [x] Protected /api/generate behind auth.
 
 ## In Progress
 
-- (Nothing currently in progress)
+- [ ] Transition to asynchronous job processing with BullMQ.
 
 ## Next Up
 
 - Phase 2: Auth + Full API
-  1. PostgreSQL + Drizzle setup (docker-compose, schema, connection)
-  2. User model (email, username, passwordHash, plan, isVerified)
-  3. Job model (jobId, userId, status, progress, input, output)
-  4. Auth routes: register, login, verify-otp, resend-otp, me
-  5. Auth middleware (JWT verification)
-  6. Error handling middleware
-  7. Protect /api/generate behind auth
-  8. Job status polling endpoint
-  9. Video history endpoint
+  1. Install BullMQ and configure Redis connection for queues.
+  2. Implement `src/queues/video.queue.ts` (Job producer).
+  3. Implement `src/workers/video.worker.ts` (Job consumer/processor).
+  4. Refactor `POST /api/generate` to enqueue jobs.
+  5. Job status polling endpoint (`GET /api/jobs/:id`).
+  6. Video history endpoint (`GET /api/videos`).
+  7. Error handling middleware refinement.
 - Phase 3: Frontend
 - Phase 4: Payments + Launch
 

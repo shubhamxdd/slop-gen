@@ -4,11 +4,13 @@
 
 | Layer     | Technology                  | Role                                      |
 | --------- | --------------------------- | ----------------------------------------- |
-| Framework | Node.js + Express + TS      | Backend API and Video Pipeline            |
+| Framework | Node.js + Express + TS      | Backend API and API Layer                 |
+| Worker    | Node.js + BullMQ + TS       | Background Video Pipeline Processing      |
 | Frontend  | Vite + React + TS           | User Interface                            |
 | UI        | Vanilla CSS (Modern)        | Styling (Avoiding Tailwind per guidelines)|
 | Auth      | JWT + Bcrypt + OTP          | Custom Authentication with Email Verify   |
-| Database  | PostgreSQL (Docker)         | User, Job, Video, and OTP storage         |
+| Database  | PostgreSQL (Docker)         | User, Job, and Video storage              |
+| Cache     | Redis                       | OTP, Job Queue, and Rate Limit storage    |
 | ORM       | Drizzle ORM                 | Type-safe SQL queries                     |
 | Pipeline  | FFmpeg                      | Video Compositing and Audio Merging       |
 | AI Models | OpenRouter (DeepSeek)       | Script Generation                         |
@@ -18,15 +20,18 @@
 ## System Boundaries
 
 - `src/pipeline/` — Core generation logic (Script, TTS, Subtitles, Compositing).
+- `src/queues/` — BullMQ queue definitions and producers.
+- `src/workers/` — Background worker logic that consumes queue jobs.
 - `src/routes/` — API endpoint definitions.
-- `src/db/` — Drizzle schema, migrations, and database connection.
+- `src/db/` — Drizzle schema, migrations, connection, and Redis client.
 - `src/middleware/` — Auth verification, error handling.
 - `outputs/` — Local storage for generated media (audio, video, subs).
 - `assets/` — Static assets (background gameplay clips).
 
 ## Storage Model
 
-- **PostgreSQL**: Stores user accounts, job statuses, video metadata, and OTP codes.
+- **PostgreSQL**: Stores user accounts, job metadata, and video records.
+- **Redis**: Stores ephemeral OTP codes, resend rate limit counters, and BullMQ job state.
 - **File System / DO Spaces**: Stores final MP4 outputs, intermediate audio chunks, and subtitle files.
 
 ## Auth and Access Model
@@ -45,3 +50,4 @@
 3. Free tier users are limited to 5 videos per month.
 4. Script generation must return a valid JSON array of dialogue.
 5. Email must be verified before user can generate videos.
+6. **Target-State Async Processing**: Future goal for API requests to return a job ID immediately and never block on the FFmpeg pipeline (to be implemented via BullMQ).
