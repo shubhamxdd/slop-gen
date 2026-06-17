@@ -1,12 +1,12 @@
 import { redis } from '../db/redis';
-import crypto from 'crypto';
+import { randomInt } from 'crypto';
 
 export class OtpService {
   private static PREFIX = 'otp:';
   private static EXPIRY = 600; // 10 minutes
 
   static async generateAndStore(userId: string): Promise<string> {
-    const otp = crypto.randomInt(100000, 1000000).toString();
+    const otp = randomInt(100000, 1000000).toString();
     const key = `${this.PREFIX}${userId}`;
     
     await redis.set(key, otp, 'EX', this.EXPIRY);

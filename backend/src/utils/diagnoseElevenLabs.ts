@@ -14,6 +14,11 @@ async function diagnose() {
     return;
   }
 
+  if (!apiKey) {
+    console.error('❌ ELEVENLABS_API_KEY is not set. Cannot proceed with diagnostics.');
+    return;
+  }
+
   try {
     console.log('2. Checking User Subscription and Usage...');
     const user = await axios.get('https://api.elevenlabs.io/v1/user', {
