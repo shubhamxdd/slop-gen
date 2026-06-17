@@ -7,12 +7,17 @@ dotenv.config({ path: path.join(__dirname, '../../.env') });
 async function diagnose() {
   const apiKey = process.env.ELEVENLABS_API_KEY;
   console.log('Testing ElevenLabs Connectivity...');
-  console.log('API Key (masked):', apiKey ? `${apiKey.substring(0, 4)}...${apiKey.substring(apiKey.length - 4)}` : 'MISSING');
+  console.log('API Key Status:', apiKey ? 'PRESENT' : 'MISSING');
+
+  if (!apiKey) {
+    console.error('❌ Cannot proceed: ELEVENLABS_API_KEY is missing in .env');
+    return;
+  }
 
   try {
     console.log('2. Checking User Subscription and Usage...');
     const user = await axios.get('https://api.elevenlabs.io/v1/user', {
-        headers: { 'xi-api-key': apiKey || '' }
+        headers: { 'xi-api-key': apiKey }
     });
     const sub = user.data.subscription;
     console.log('✅ Success! User data retrieved.');
@@ -27,7 +32,7 @@ async function diagnose() {
             text: 'Hello',
             model_id: 'eleven_flash_v2_5'
         }, {
-            headers: { 'xi-api-key': apiKey || '' }
+            headers: { 'xi-api-key': apiKey }
         });
         console.log('✅ Success! Standard voice is working.');
     } catch (e: any) {

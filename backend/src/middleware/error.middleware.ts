@@ -13,12 +13,16 @@ export const errorHandler = (
     return res.status(400).json({
       success: false,
       error: 'Validation failed',
-      details: err.errors.map((e) => ({ path: e.path, message: e.message })),
+      details: err.issues.map((e) => ({ path: e.path, message: e.message })),
     });
   }
 
   const status = err.status || 500;
-  const message = err.message || 'Internal Server Error';
+  let message = err.message || 'Internal Server Error';
+
+  if (status >= 500 && process.env.NODE_ENV !== 'development') {
+    message = 'Internal Server Error';
+  }
 
   res.status(status).json({
     success: false,

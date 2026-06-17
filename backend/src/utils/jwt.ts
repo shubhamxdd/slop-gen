@@ -13,8 +13,13 @@ export const signToken = (payload: JwtPayload): string => {
 
 export const verifyToken = (token: string): JwtPayload => {
   try {
-    return jwt.verify(token, env.JWT_SECRET) as JwtPayload;
-  } catch (error) {
+    const decoded = jwt.verify(token, env.JWT_SECRET) as any;
+    if (!decoded || typeof decoded !== 'object' || !decoded.userId) {
+      throw new Error('Invalid token payload');
+    }
+    return decoded as JwtPayload;
+  } catch (error: any) {
+    if (error.message === 'Invalid token payload') throw error;
     throw new Error('Invalid or expired token');
   }
 };

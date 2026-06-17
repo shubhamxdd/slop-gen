@@ -1,11 +1,12 @@
 import { redis } from '../db/redis';
+import crypto from 'crypto';
 
 export class OtpService {
   private static PREFIX = 'otp:';
   private static EXPIRY = 600; // 10 minutes
 
   static async generateAndStore(userId: string): Promise<string> {
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otp = crypto.randomInt(100000, 1000000).toString();
     const key = `${this.PREFIX}${userId}`;
     
     await redis.set(key, otp, 'EX', this.EXPIRY);
@@ -24,20 +25,14 @@ export class OtpService {
     return false;
   }
 
-  static async canResend(userId: string): Promise<boolean> {
+  static async consumeResendSlot(userId: string): Promise<boolean> {
     const key = `resend_limit:${userId}`;
-    const count = await redis.get(key);
+    const count = await redis.incr(key);
     
-    if (count && parseInt(count) >= 3) {
-      return false;
+    if (count === 1) {
+      await redis.expire(key, 3600); // 1 hour reset
     }
     
-    return true;
-  }
-
-  static async trackResend(userId: string) {
-    const key = `resend_limit:${userId}`;
-    await redis.incr(key);
-    await redis.expire(key, 3600); // 1 hour reset
+    return count <= 3;
   }
 }

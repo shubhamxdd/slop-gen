@@ -50,4 +50,4 @@
 3. Free tier users are limited to 5 videos per month.
 4. Script generation must return a valid JSON array of dialogue.
 5. Email must be verified before user can generate videos.
-6. **Async Processing**: API requests for video generation must return a job ID immediately and never block on the FFmpeg pipeline.
+6. **Target-State Async Processing**: Future goal for API requests to return a job ID immediately and never block on the FFmpeg pipeline (to be implemented via BullMQ).

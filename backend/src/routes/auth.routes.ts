@@ -53,13 +53,21 @@ router.post('/register', async (req, res, next) => {
 
     // Generate OTP
     const otp = await OtpService.generateAndStore(newUser.id);
-    await sendOtpEmail(email, otp);
-
-    res.status(201).json({ 
-      success: true, 
-      message: 'User registered. Please verify your email.',
-      userId: newUser.id 
-    });
+    try {
+      await sendOtpEmail(email, otp);
+      res.status(201).json({ 
+        success: true, 
+        message: 'User registered. Please verify your email.',
+        userId: newUser.id 
+      });
+    } catch (emailError) {
+      console.error('Failed to send registration OTP email:', emailError);
+      res.status(201).json({ 
+        success: true, 
+        message: 'User registered, but we could not send the verification email. Please try resending it.',
+        userId: newUser.id 
+      });
+    }
   } catch (error) {
     next(error);
   }
@@ -102,16 +110,15 @@ router.post('/login', async (req, res, next) => {
 // Verify OTP
 router.post('/verify-otp', async (req, res, next) => {
   try {
-    const { userId, otp } = z.object({ userId: z.string().uuid(), otp: z.string() }).parse(req.body);
-
-    console.log('Verifying OTP for userId:', userId, 'with OTP:', otp);
+    const { userId, otp } = z.object({ 
+      userId: z.string().uuid(), 
+      otp: z.string().length(6) 
+    }).parse(req.body);
 
     const isValid = await OtpService.verify(userId, otp);
     if (!isValid) {
       return res.status(400).json({ success: false, error: 'Invalid or expired OTP' });
     }
-
-    console.log('OTP verified successfully for userId:', userId);
 
     await db.update(users).set({ isVerified: true }).where(eq(users.id, userId));
 
@@ -123,7 +130,6 @@ router.post('/verify-otp', async (req, res, next) => {
 
 // Resend OTP
 router.post('/resend-otp', async (req, res, next) => {
-  // TODO: test it 
   try {
     const { userId } = z.object({ userId: z.string().uuid() }).parse(req.body);
 
@@ -139,16 +145,20 @@ router.post('/resend-otp', async (req, res, next) => {
       return res.status(400).json({ success: false, error: 'Email already verified' });
     }
 
-    const canResend = await OtpService.canResend(userId);
-    if (!canResend) {
+    const allowed = await OtpService.consumeResendSlot(userId);
+    if (!allowed) {
       return res.status(429).json({ success: false, error: 'Too many attempts. Please try again in an hour.' });
     }
 
     const otp = await OtpService.generateAndStore(userId);
-    await OtpService.trackResend(userId);
-    await sendOtpEmail(user.email, otp);
-
-    res.json({ success: true, message: 'New verification code sent' });
+    
+    try {
+      await sendOtpEmail(user.email, otp);
+      res.json({ success: true, message: 'New verification code sent' });
+    } catch (emailError) {
+      console.error('Failed to send OTP email:', emailError);
+      res.status(500).json({ success: false, error: 'Failed to send verification email. Please try again.' });
+    }
   } catch (error) {
     next(error);
   }
