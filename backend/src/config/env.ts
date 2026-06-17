@@ -8,7 +8,7 @@ const envSchema = z.object({
   PORT: z.string().default('3000'),
   DATABASE_URL: z.string().url(),
   REDIS_URL: z.string().url(),
-  JWT_SECRET: z.string().min(8),
+  JWT_SECRET: z.string().min(32),
   OPENROUTER_API_KEY: z.string().optional(),
   ELEVENLABS_API_KEY: z.string().optional(),
   SMTP_USER: z.string().email().optional(),

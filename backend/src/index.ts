@@ -25,15 +25,16 @@ app.get('/', (req: Request, res: Response) => {
 app.use('/api/auth', authRoutes);
 
 app.post('/api/generate', authMiddleware, async (req: AuthRequest, res, next) => {
+  let jobId: string | undefined;
   try {
     const { topic, characters, backgroundId } = req.body;
     const userId = req.user!.userId;
-    
+
     if (!topic || !characters || !backgroundId) {
       return res.status(400).json({ success: false, error: 'Missing required fields: topic, characters, backgroundId' });
     }
 
-    // 1. Check user limits
+    // 1. Check user limits and increment atomically
     const user = await db.query.users.findFirst({
       where: eq(users.id, userId),
     });
@@ -44,41 +45,48 @@ app.post('/api/generate', authMiddleware, async (req: AuthRequest, res, next) =>
       return res.status(403).json({ success: false, error: 'Free tier limit reached (5 videos/month)' });
     }
 
-    const jobId = uuidv4();
+    jobId = uuidv4();
 
-    // 2. Create job entry in DB
-    await db.insert(jobs).values({
-      id: jobId,
-      userId,
-      topic,
-      status: 'processing',
-      input: { topic, characters, backgroundId },
+    // 2. Create job entry in DB and increment user video count atomically
+    await db.transaction(async (tx) => {
+      await tx.insert(jobs).values({
+        id: jobId!,
+        userId,
+        topic,
+        status: 'processing',
+        input: { topic, characters, backgroundId },
+      });
+
+      await tx.update(users)
+        .set({ videosGeneratedThisMonth: sql`${users.videosGeneratedThisMonth} + 1` })
+        .where(eq(users.id, userId));
     });
 
-    // 3. Increment user video count
-    await db.update(users)
-      .set({ videosGeneratedThisMonth: sql`${users.videosGeneratedThisMonth} + 1` })
-      .where(eq(users.id, userId));
-    
     // 4. Run pipeline (still synchronous for now)
     const result = await runPipeline(jobId, { topic, characters, backgroundId });
 
     if (result.success) {
       // Update job as completed
       await db.update(jobs)
-        .set({ status: 'completed', progress: 'Finished', outputUrl: result.videoPath })
+        .set({ status: 'completed', progress: 'Finished', outputUrl: result.videoPath, updatedAt: new Date() })
         .where(eq(jobs.id, jobId));
 
       res.json({ success: true, jobId, videoPath: result.videoPath });
     } else {
       // Update job as failed
       await db.update(jobs)
-        .set({ status: 'failed', error: result.error })
+        .set({ status: 'failed', error: result.error, updatedAt: new Date() })
         .where(eq(jobs.id, jobId));
 
       res.status(500).json({ success: false, jobId, error: result.error });
     }
   } catch (error) {
+    // Update job status to failed if an exception occurs
+    if (jobId) {
+      await db.update(jobs)
+        .set({ status: 'failed', error: (error as Error).message || 'Unknown error', updatedAt: new Date() })
+        .where(eq(jobs.id, jobId));
+    }
     next(error);
   }
 });

@@ -13,12 +13,19 @@ export const errorHandler = (
     return res.status(400).json({
       success: false,
       error: 'Validation failed',
-      details: err.errors.map((e) => ({ path: e.path, message: e.message })),
+      details: err.issues.map((e) => ({ path: e.path, message: e.message })),
     });
   }
 
   const status = err.status || 500;
-  const message = err.message || 'Internal Server Error';
+
+  // Log the actual error for debugging
+  if (status >= 500) {
+    console.error('Internal Server Error:', err);
+  }
+
+  // For 5xx errors, use generic message; for others, use the actual message
+  const message = status >= 500 ? 'Internal Server Error' : (err.message || 'Internal Server Error');
 
   res.status(status).json({
     success: false,

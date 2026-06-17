@@ -1,10 +1,12 @@
-import { pgTable, uuid, varchar, timestamp, text, jsonb } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, varchar, timestamp, text, jsonb, pgEnum } from 'drizzle-orm/pg-core';
 import { users } from './users';
+
+export const jobStatusEnum = pgEnum('job_status', ['pending', 'processing', 'completed', 'failed']);
 
 export const jobs = pgTable('jobs', {
   id: uuid('id').defaultRandom().primaryKey(),
   userId: uuid('user_id').references(() => users.id).notNull(),
-  status: varchar('status', { length: 20 }).default('pending').notNull(), // pending, processing, completed, failed
+  status: jobStatusEnum('status').default('pending').notNull(),
   progress: varchar('progress', { length: 100 }).default('Started').notNull(),
   topic: text('topic').notNull(),
   input: jsonb('input').notNull(),

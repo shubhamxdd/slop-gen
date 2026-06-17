@@ -16,8 +16,7 @@ export const sendOtpEmail = async (to: string, otp: string) => {
   }
 
   if (!env.SMTP_USER || !env.SMTP_PASS) {
-    console.warn('⚠️ SMTP credentials not configured. Skipping email send.');
-    return;
+    throw new Error('SMTP credentials not configured');
   }
 
   const mailOptions = {

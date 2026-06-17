@@ -9,10 +9,15 @@ async function diagnose() {
   console.log('Testing ElevenLabs Connectivity...');
   console.log('API Key (masked):', apiKey ? `${apiKey.substring(0, 4)}...${apiKey.substring(apiKey.length - 4)}` : 'MISSING');
 
+  if (!apiKey) {
+    console.error('❌ ELEVENLABS_API_KEY is not set. Cannot proceed with diagnostics.');
+    return;
+  }
+
   try {
     console.log('2. Checking User Subscription and Usage...');
     const user = await axios.get('https://api.elevenlabs.io/v1/user', {
-        headers: { 'xi-api-key': apiKey || '' }
+        headers: { 'xi-api-key': apiKey }
     });
     const sub = user.data.subscription;
     console.log('✅ Success! User data retrieved.');
@@ -27,7 +32,7 @@ async function diagnose() {
             text: 'Hello',
             model_id: 'eleven_flash_v2_5'
         }, {
-            headers: { 'xi-api-key': apiKey || '' }
+            headers: { 'xi-api-key': apiKey }
         });
         console.log('✅ Success! Standard voice is working.');
     } catch (e: any) {
